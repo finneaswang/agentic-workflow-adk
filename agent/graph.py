@@ -127,8 +127,13 @@ propose_directions = Agent(
 def direction_gate(node_input: Directions):
     cands = [c.model_dump() for c in node_input.candidates]
     yield Event(state={"candidates": cands})
-    # TODO: GATE_INPUT - suspend the graph here: yield a RequestInput with a message,
-    # a response_schema (the form: one field, pick) and payload={"candidates": cands}
+    yield RequestInput(
+        message="Pick tonight's direction: 1, 2, 3 or 4.",
+        response_schema={
+            "type": "object",
+            "properties": {
+                "pick": {"type": "string", "enum": ["1", "2", "3", "4"]}}},
+        payload={"candidates": cands})
 
 
 def persist_direction(node_input, candidates: list = []):

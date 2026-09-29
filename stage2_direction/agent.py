@@ -20,10 +20,15 @@ from agent.schemas import Directions
 
 join_research = JoinNode(name="join_research")
 
-propose_directions = None  # TODO: PROPOSER - define the agent node: Agent(name, model, instruction, output_schema)
+propose_directions = Agent(
+    name="propose_directions",
+    model=config.MODEL,
+    instruction=PROPOSE_INSTRUCTION,
+    output_schema=Directions)
 
 root_agent = Workflow(
     name="stage2_direction",
     description="research -> 4 candidates -> the human door",
     edges=[(START, scan_trends, join_research),
-           (START, read_backlog, join_research)])  # TODO: STAGE2_EDGES - add the third chain, from the join
+           (START, read_backlog, join_research),
+           (join_research, propose_directions, direction_gate)])
