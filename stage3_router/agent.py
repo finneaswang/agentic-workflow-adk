@@ -33,13 +33,21 @@ scripter = Agent(
     instruction=SCRIPT_INSTRUCTION,
     output_schema=Script)
 
-def quarantine(node_input):  # TODO: QUARANTINE - 5c replaces this placeholder with the task agent
-    return Event(output={"blocked": True, "title": node_input.get("title", "")},
-                 message="blocked: the channel's policy refused this direction")
+quarantine = Agent(
+    name="quarantine",
+    model=config.MODEL,
+    instruction=QUARANTINE_INSTRUCTION,
+    mode="task",
+    tools=[find_policy_hits, suggest_replacement],
+    output_schema=CleanedDirection,
+)
 
 root_agent = Workflow(
     name="stage3_router",
     description="research -> you -> the policy gate -> a script",
     edges=[(START, scan_trends, join_research),
            (START, read_backlog, join_research),
-           (join_research, propose_directions, direction_gate)])  # TODO: ROUTER_EDGES - 5a: append persist_direction; 5b: append policy_check, then its two routes
+           (join_research, propose_directions, direction_gate,
+            persist_direction, policy_check),
+           (policy_check, {"OK": scripter, "BLOCK": quarantine}),
+           (quarantine, scripter)])

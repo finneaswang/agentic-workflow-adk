@@ -153,7 +153,8 @@ def persist_direction(node_input, candidates: list = []):
     else:
         chosen = {"title": "untitled", "angle": "", "evidence": []}
     hook = chosen.get("hook") or " ".join(chosen["title"].split()[:4])
-    # TODO: PERSIST_STATE - yield an Event whose state holds direction, angle, hook, and user:prefs
+    yield Event(state={"direction": chosen["title"], "angle": chosen.get("angle", ""),
+                       "hook": hook, "user:prefs": {"last_direction": chosen["title"]}})
     yield Event(output=chosen)
 
 
@@ -177,7 +178,7 @@ def policy_check(node_input):
     lin = st.setdefault("lineage", {"evidence": [], "gates": {}})
     lin.setdefault("gates", {})["policy"] = {"ok": not bad, "hits": bad}
     state.save(st)
-    # TODO: POLICY_ROUTE - return an Event whose output is node_input and whose route is "BLOCK" if bad else "OK"
+    return Event(output=node_input, route="BLOCK" if bad else "OK")
 
 
 
