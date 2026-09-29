@@ -57,15 +57,16 @@ node_modules/
 *.tsbuildinfo
 .DS_Store
 
-# the nine files students edit. Not tracked: setup and scripts/start.sh copy
-# them from starter/ when they are missing and never overwrite them, so a tree
-# that was filled in while testing can never reach a commit.
-stage0_prompt/agent.py
-stage1_fanout/agent.py
-stage2_direction/agent.py
-stage3_router/agent.py
-stage4_memory/agent.py
-stage5_rag/agent.py
-stage6_video/agent.py
-agent/graph.py
-agent/deliver.py
+# NOTE (Finneas): upstream ignores the nine student-edit files so half-finished
+# work can never reach a commit. This fork intentionally TRACKS them — the
+# completed versions are the whole point of this repo. starter/ still holds the
+# carved originals.
+# stage0_prompt/agent.py
+# stage1_fanout/agent.py
+# stage2_direction/agent.py
+# stage3_router/agent.py
+# stage4_memory/agent.py
+# stage5_rag/agent.py
+# stage6_video/agent.py
+# agent/graph.py
+# agent/deliver.py
