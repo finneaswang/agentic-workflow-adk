@@ -44,7 +44,8 @@ root_agent = Workflow(
     name="stage5_rag",
     description="trends + backlog + feedback -> you -> the policy gate -> a script, with memory",
     edges=[(START, scan_trends, join_research),
-           (START, read_backlog, join_research),  # TODO: RAG_NODE - add the third reader into the join: (START, read_feedback, join_research)
+           (START, read_backlog, join_research),
+           (START, read_feedback, join_research),
            (join_research, propose_directions, direction_gate,
             persist_direction, policy_check),
            (policy_check, {"OK": scripter, "BLOCK": quarantine}),
