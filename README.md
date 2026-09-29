@@ -27,6 +27,11 @@ and the video render happens as a long-running async tool.
 **Live deployment**: [vibestudio-851240471506.us-central1.run.app](https://vibestudio-851240471506.us-central1.run.app)
 (the full pipeline app of step 9, running on Cloud Run in `us-central1`).
 
+Publishing to the workshop platform (vibetube.dev, event `UBC`) is left off
+for now: the app renders with the free Veo stand-in (`STUDIO_REAL_VIDEO=0`).
+To publish for real, set `STUDIO_REAL_VIDEO=1` in `.env`, re-run the pipeline,
+and publish from the app — vibetube.dev keeps one video per project + room.
+
 ## How to run
 
 ```bash
