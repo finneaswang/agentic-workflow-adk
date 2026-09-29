@@ -15,14 +15,17 @@ and the video render happens as a long-running async tool.
 ## Progress
 
 - [x] Environment setup (`setup_project.sh` + `setup_codelab.sh`, preflight green)
-- [ ] Step 3 · Monolithic agent — first function tool
-- [ ] Step 4 · Fan-out and the human pause — `Workflow`, `JoinNode`, `RequestInput`
-- [ ] Step 5 · State and Router — `Event(state=...)`, deterministic policy router
-- [ ] Step 6 · Memory Bank — GEAP memory via callbacks
-- [ ] Step 7 · RAG Engine — audience comments as one more reader in the fan-out
-- [ ] Step 8 · The video — `LongRunningFunctionTool` + Veo
-- [ ] Step 9 · Deploy — the finished app on Cloud Run
+- [x] Step 3 · Monolithic agent — first function tool
+- [x] Step 4 · Fan-out and the human pause — `Workflow`, `JoinNode`, `RequestInput`
+- [x] Step 5 · State and Router — `Event(state=...)`, deterministic policy router
+- [x] Step 6 · Memory Bank — GEAP memory via callbacks
+- [x] Step 7 · RAG Engine — audience comments as one more reader in the fan-out
+- [x] Step 8 · The video — `LongRunningFunctionTool` + Veo
+- [x] Step 9 · Deploy — the finished app on Cloud Run
 - [ ] Step 10 · Summary
+
+**Live deployment**: [vibestudio-851240471506.us-central1.run.app](https://vibestudio-851240471506.us-central1.run.app)
+(the full pipeline app of step 9, running on Cloud Run in `us-central1`).
 
 ## How to run
 
@@ -55,4 +58,31 @@ starter/        the carved files students receive
 
 ## What I learned
 
-_(filled in as the steps land)_
+_(being filled in as the steps land)_
+
+- **Step 3 · Monolithic agent**: tools are just Python functions the model calls
+  through a five-stage protocol (`function_call` → runtime executes →
+  `function_response` → synthesis). But prompt rules are advisory — a
+  follow-up message made the agent skip its own "confirm before scripting"
+  rule. That gap is why graphs exist.
+- **Step 4 · Fan-out + human pause**: a `Workflow` is a first-class agent.
+  Two reader chains from `START` into a `JoinNode`; an `Agent` itself is a
+  node (`single_turn`, `output_schema=Directions`); a human pause is a node
+  that yields `RequestInput` — the run ends, the session holds a pending
+  receipt, and a `function_response` with the interrupt id resumes it.
+- **Step 5 · State and Router**: shared state via `Event(state=...)` with the
+  `user:` prefix for durable prefs; parameters bound from state by name.
+  Policy is deterministic code reading data (`policy_words.txt`) — the model
+  never grades its own homework. `mode="task"` agents run tools to a
+  `finish_task` with a typed schema (the quarantine cleaner).
+- **Step 6 · Memory Bank**: `before_model_callback` injects recalled facts
+  into the outgoing `LlmRequest`; `after_agent_callback` submits the turn for
+  consolidation. Facts carry topics (CREATOR_TASTE, CHANNEL_RULES) and are
+  deduped/updated by the service, not by prompts.
+- **Step 7 · RAG Engine**: audience comments live in a GEAP corpus; a
+  retrieval function node is just one more reader in the research fan-out,
+  returning cited passages into the join dict.
+- **Step 8 · Long-running tool**: the render desk wraps Veo in a
+  `LongRunningFunctionTool` — the graph suspends with a pending receipt
+  (`render_submit`), a separate worker process (`agent/deliver.py`) resumes
+  it by call id. Nothing polls; nothing stays alive waiting.
